@@ -24,3 +24,9 @@ Querys, Views, Procedures, Others ...
 
 
 
+3 Etapa
+  Devemos instalar o Oracle VM VirtualBox. Acessar o link: https://www.virtualbox.org/wiki/Downloads
+  - Escolhemos na aba a opção Download
+  - Clicamos no link -> Windows hosts
+  - Fazemos o Downloads
+  - Next, Next até finalizarmos!
