@@ -1,0 +1,240 @@
+﻿
+ssh root@192.168.56.102
+
+ssh oracle@192.168.56.102
+
+--ARQUIVO DE CONFIGURAÇAO DO ORACLE DATABASE
+--TO DO
+
+01 - COLOCANDO IP FIXO
+vi /etc/hosts
+
+#CONFIGURACAO REFERENTE AO ORACLE
+192.168.0.102  localhost.localdomain  localhost
+#FIM DA CONFIGURACAO DO ORACLE
+
+--sair e salvar wq
+
+02 - CONFIGURANDO O KERNEL
+
+vi /etc/sysctl.conf
+
+#CONFIGURACAO REFERENTE AO ORACLE
+fs.suid_dumpable = 1
+fs.aio-max-nr = 1048576
+fs.file-max = 6815744
+kernel.shmall = 2097152
+kernel.shmmax = 536870912
+kernel.shmmni = 4096
+kernel.sem = 250 32000 100 128
+net.ipv4.ip_local_port_range = 9000 65500
+net.core.rmem_default = 262144
+net.core.rmem_max = 4194304
+net.core.wmem_default = 262144
+net.core.wmem_max = 1048586
+#FIM DA CONFIGURACAO DO ORACLE
+
+03 - CONFIRMANDO E ATUALIZANDO O KERNEL
+/sbin/sysctl –p /etc/sysctl.conf
+
+04 - VERIFICANDO AS CONFIGURACOES DO KERNEL
+/sbin/sysctl -a
+
+05 - ARQUIVO DE LIMITES
+
+vi /etc/security/limits.conf
+
+#CONFIGURACAO REFERENTE AO ORACLE
+oracle              soft    nproc   2047
+oracle              hard    nproc   16384
+oracle              soft    nofile  4096
+oracle              hard    nofile  65536
+oracle              soft    stack   10240
+#FIM DA CONFIGURACAO DO ORACLE
+
+06 - VERIFICANDO O DIRETORIO DE LOGIN
+
+vi /etc/pam.d/login
+
+#CONFIGURACAO REFERENTE AO ORACLE
+session    required     /lib/security/pam_limits.so
+#FIM DA CONFIGURACAO DO ORACLE
+
+07 - DESABILITANDO MÓDULO DE SEGURANCA
+vi /etc/selinux/config 
+
+SELINUX=disabled
+
+08 - INSTALAR OS PACOTES
+
+08.2 - MONTAR A IMAGEM DO LINUX NA MAQUINA VIRTUAL
+
+cd /media
+ls - lart
+
+08.3 - ENTRAR NO DVD PELO MOBA
+cd Oracle\ Linux\ Server\ dvd\ 20110119/
+
+08.4 - VERIFICAR O CONTEUDO DO CD
+ls -lart
+
+08.5 - ENTRAR NA PASTA SERVER 
+cd Server
+
+08.6 - Abaixo instalar um por um
+
+rpm -Uvh binutils-2.*
+rpm -Uvh compat-libstdc++-33*
+rpm -Uvh compat-libstdc++-33*.i386.rpm
+rpm -Uvh elfutils-libelf*
+rpm -Uvh gcc-4.*
+rpm -Uvh gcc-c++-4.*
+rpm -Uvh glibc-2.*
+rpm -Uvh glibc-common-2.*
+rpm -Uvh glibc-devel-2.*
+rpm -Uvh glibc-headers-2.*
+rpm -Uvh ksh*
+rpm -Uvh libaio-0.*
+rpm -Uvh libaio-devel-0.*
+rpm -Uvh libgomp-4.*
+rpm -Uvh libgcc-4.*
+rpm -Uvh libstdc++-4.*
+rpm -Uvh libstdc++-devel-4.*
+rpm -Uvh make-3.*
+rpm -Uvh sysstat-7.*
+rpm -Uvh unixODBC-2.*
+rpm -Uvh unixODBC-devel-2.*
+rpm -Uvh numactl-devel-*
+
+09 - CRIANDO OS GRUPOS DE USUARIOS
+
+groupadd oinstall
+groupadd dba
+groupadd oper
+
+10 - CRIANDO O USUARIO ORACLE PARA INSTALACAO
+
+useradd -g oinstall -G dba oracle
+
+11 - DEFININDO A SENHA
+
+--senha oracle
+passwd oracle
+
+12 - CRIANDO OS DIRETORIOS DE INSTALACAO DO ORACLE
+
+mkdir -p /u01/app/oracle/product/11.2.0/db_home1
+chown -R oracle.oinstall /u01
+
+13 - Definindo LOCALHOST para o X
+
+xhost  +localhost
+
+14 - REINICIANDO A MAQUINA
+
+shutdown -h 0
+
+15 - ANTES DE INICIAR, ALTERAR A ORDEM DO BOOT PARA HD
+
+ssh oracle@192.168.56.102
+
+16 - VERIFICAR OS ARQUIVOS DENTRO DO DIRETORIO HOME DO ORACLE (USUARIO)
+
+ls -lart
+
+17 - EDITAR O ARQUIVO .bash_profile
+
+17.2 - EXPLICAR O QUE É VARIAVEL DE AMBIENTE
+
+17.3 ALTERANDO O ARQUIVO
+
+vi .bash_profile
+
+# CONFIGURACOES DO ORACLE
+TMP=/tmp; export TMP
+TMPDIR=$TMP; export TMPDIR
+
+ORACLE_HOSTNAME=localhost; export ORACLE_HOSTNAME
+ORACLE_UNQNAME=orcl; export ORACLE_UNQNAME
+ORACLE_BASE=/u01/app/oracle; export ORACLE_BASE
+ORACLE_HOME=$ORACLE_BASE/product/11.2.0/db_home1; export ORACLE_HOME
+ORACLE_SID=orcl; export ORACLE_SID
+PATH=/usr/sbin:$PATH; export PATH
+PATH=$ORACLE_HOME/bin:$PATH; export PATH
+
+LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib; export LD_LIBRARY_PATH
+CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib; export CLASSPATH
+
+# FIM DAS CONFIGURACOES DO ORACLE
+
+18 - CARREGANDO O BASH
+. .bash_profile
+
+19 - VERIFICANDO AS VARIAVEIS SETADAS
+
+echo $ORACLE_HOME
+
+shutdown -h 0
+
+20 - COPIAR O INSTALADOR DO ORACLE
+
+21 - ENTRAR NO U01
+
+cd u01
+
+ls -lart
+
+22 - DESCOMPACTANDO OS ARQUIVOS - os tres
+
+unzip [nome do arquivo]
+
+23 - ACESSAR A PASTA QUE OS AQUIVOS FORAM DESCOMPACTADOS
+
+cd database
+
+24 -  REALIZAR UM SNAPSHOT
+
+su - root /PARA DESLIGAR A MAQUINA/
+
+25 - LOGAR COM ORACLE
+
+ssh oracle@192.168.56.102
+
+26 - TRAZER O X PARA O WINDOWS
+
+export DISPLAY=192.168.56.1:0.0;
+
+27 - VERIFICANDO O X
+
+echo $DISPLAY
+
+28 - TESTAR O X
+
+xclock
+
+30 - IR NA PASTA DO INSTALADOR
+
+cd /u01/database
+
+
+31 - PASSAR A INSTALACAO
+
+./ runInstaller
+
+-----------------------------------------------
+
+https://192.168.56.102:1158/em
+
+lsnrctl start
+
+sqlplus / as sysdba
+
+emctl start dbconsole
+
+
+
+
+
+
+
+
