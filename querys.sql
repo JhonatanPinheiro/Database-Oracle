@@ -1089,7 +1089,89 @@ SELECT * FROM RELATORIO;
 
 ------------------------------------------------------------------204.Deferrable Constraints - Parte01----------------------------------
 
+/*
+--Data Manipulation Language - DML -> São operações de manipulação de dados 
+----------É o grupo de comandos dentro da linguagem SQL utilizado para a recuperação, inclusão, remoção e modificação de informações em bancos de dados. Os principais comandos DML são Select, Insert, Update e Delete
 
+--Data Transaction Language - DTL -> São operações de Trasação de dados 
+----------Os comandos DTL são responsáveis por gerenciar diferentes transações ocorridas dentro de um banco de dados. Ele é dividido em 3 comandos:
+            - BEGIN TRAN (OU BEGIN TRANSACTION) – Marca o começo de uma transação no banco da dados  que pode ser completada ou não.
+            - COMMIT – Envia todos os dados da transação permanentemente para o banco de dados.
+            - ROLLBACK – Desfaz as alterações feitas na transação realizada.
+*/
+
+-----------------------------------------------205. Deferable - Parte 02--------------------------------------------------------
+
+CREATE TABLE FUNCIONARIO(
+    IDFUNCIONARIO INT CONSTRAINT PK_FUNCIONARIO PRIMARY KEY,
+    NOME VARCHAR(100)
+
+);
+
+
+DROP TABLE TELEFONE;
+
+
+CREATE TABLE TELEFONE(
+    IDTELEFONE INT PRIMARY KEY,
+    NUMERO VARCHAR2(10),
+    ID_FUNCIONARIO INT
+);
+
+
+
+ALTER TABLE TELEFONE ADD CONSTRAINT FK_TELEFONE
+FOREIGN KEY (ID_FUNCIONARIO) REFERENCES FUNCIONARIO;
+
+INSERT INTO FUNCIONARIO VALUES(1,'MAURICIO');
+INSERT INTO TELEFONE VALUES(10,'24242454');
+
+
+/*A  Constraint de integridade referencial , nossa (FK) checa a integridade logo após o comando de DML
+INSERT/DELETE/UPDATE -> Não possibilitando assim a inserção de registro sem referencia*/
+
+--Dará erro 
+DELETE FROM FUNCIONARIO WHERE IDFUNCIONARIO = 1;
+
+
+
+-- VERIFICANDO O ESTADO DAAS CONSTRAINTS
+SELECT CONSTRAINT_NAME, DEFERRABLE, DEFERRED
+FROM USER_CONSTRAINTS WHERE TABLE_NAME IN ('FUNCIONARIO','TELEFONE');
+
+------------------------------------------------------------------------------------206 DEFERABLE - PART 03 ------------------------------------------------------
+/*
+DEFERRED -> Ele diz se vai ser checado na hora da DML ou na hora da DTL , lembrando que o padrão é DML
+DEFERRABLE -> Ele diz se pode ser atrasada ou se não pode ser atrasada. Ou seja se o que é ser atrasada: Se a chave não pode ser atrasa , ela será verifica na DML. Se ela puder ser atrasada ela pode ser verificada na DML ou vai ser verificada na DTL
+*/
+
+
+-- APAGANDO UMA CONSTRAINTS
+ALTER TABLE TELEFONE DROP CONSTRAINT FK_TELEFONE;
+
+--RECRIANDO A CONSTRAINT
+ALTER TABLE TELEFONE ADD CONSTRAINT FK_TELEFONE
+FOREIGN KEY (ID_FUNCIONARIO) REFERENCES FUNCIONARIO 
+DEFERRABLE;
+
+
+
+SELECT CONSTRAINT_NAME, DEFERRABLE AS ATRASADA , DEFERRED AS VERIFICACAO
+FROM USER_CONSTRAINTS WHERE TABLE_NAME IN ('FUNCIONARIO','TELEFONE');
+
+INSERT INTO TELEFONE VALUES (4,'4224435',10);
+
+SELECT * FROM FUNCIONARIO;
+
+/*MUDANDO O COMPORTAMENTO OU SEJA MUDANDO PARA DTL*/
+SET CONSTRAINTS ALL DEFERRED;
+
+INSERT INTO TELEFONE VALUES (4,'4224435',10);
+
+SELECT * FROM TELEFONE;
+SELECT * FROM FUNCIONARIO;
+
+COMMIT;
 
 
 
